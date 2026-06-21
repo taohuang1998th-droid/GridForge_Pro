@@ -1,0 +1,186 @@
+/* GridForge Pro — Popup Panel
+   设计稿原版变量体系 · 深色 / 浅色双主题
+   出品 AURLOOP · 与 LawVerify Pro 同一视觉体系  */
+
+:root {
+  --cyan:   #00E5FF;
+  --coral:  #FF8A6F;
+  --ease:   cubic-bezier(.22,.61,.36,1);
+  --font:   -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei",
+            "Helvetica Neue", Helvetica, Arial, system-ui, sans-serif;
+}
+
+/* ====================== DARK ====================== */
+.doc[data-theme="dark"] {
+  --page:         #0a1119;
+  --surface:      #101d29;
+  --surface-2:    rgba(255,255,255,.035);
+  --border:       rgba(255,255,255,.09);
+  --border-soft:  rgba(255,255,255,.06);
+  --text:         #e9f0f5;
+  --text-dim:     #8497a3;
+  --text-faint:   #5c6e7a;
+  --accent-cyan:  #3ce8ff;
+  --accent-coral: #ff9a82;
+}
+
+/* ====================== LIGHT ====================== */
+.doc[data-theme="light"] {
+  --page:         #eef3f7;
+  --surface:      #ffffff;
+  --surface-2:    #f5f8fb;
+  --border:       rgba(15,38,56,.12);
+  --border-soft:  rgba(15,38,56,.08);
+  --text:         #13242f;
+  --text-dim:     #566875;
+  --text-faint:   #8597a3;
+  --accent-cyan:  #0093b8;
+  --accent-coral: #e0552f;
+}
+
+/* ====================== BASE ====================== */
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  width: 360px;
+  font-family: var(--font);
+  -webkit-font-smoothing: antialiased;
+}
+
+.doc {
+  color: var(--text);
+  background: var(--surface);
+  transition: background .5s var(--ease), color .5s var(--ease);
+}
+
+/* ====================== POPUP PANEL ====================== */
+/* 高度随内容自然撑开，与 LawVerify Pro 等高 */
+.popup {
+  width: 100%;
+  padding: 20px 20px 22px;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── 头部 ── */
+.pp-head { display: flex; align-items: center; gap: 13px; }
+
+/* LOGO 容器：无底色背景，靠各主题自己处理透明 */
+.pp-mark {
+  width: 46px; height: 46px; flex: 0 0 auto;
+  display: block; border-radius: 10px; overflow: hidden;
+  background: transparent;
+}
+
+/* 深色：使用已抠图的透明底 PNG，直接放置 */
+.doc[data-theme="dark"] .logo-mark {
+  display: block; width: 100%; height: 100%;
+  background: url('LOGO_transparent.png') center / contain no-repeat;
+}
+
+/* 浅色：黑白版 A 标，multiply 让白底融入白色面板 */
+.doc[data-theme="light"] .logo-mark {
+  display: block; width: 100%; height: 100%;
+  background: url('黑白LOGO.png') center / contain no-repeat;
+  mix-blend-mode: multiply;
+}
+
+.pp-id { flex: 1; min-width: 0; }
+
+.pp-id .nm {
+  font-size: 17px; font-weight: 800; letter-spacing: .2px;
+  color: var(--text);
+  transition: color .5s var(--ease);
+}
+
+.pp-id .nm .pro {
+  background: linear-gradient(92deg, var(--cyan), var(--coral));
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+}
+
+.pp-id .co {
+  font-size: 11px; color: var(--text-faint); margin-top: 4px;
+  white-space: nowrap;
+  transition: color .5s var(--ease);
+}
+
+/* ── 切换开关 ── */
+.pp-toggle {
+  display: inline-flex; align-items: center; gap: 8px; flex: 0 0 auto;
+  background: none; border: none; padding: 0; cursor: pointer;
+}
+
+.pp-toggle .tlbl {
+  font-size: 12px; color: var(--text-dim); white-space: nowrap;
+  font-family: var(--font);
+  transition: color .5s var(--ease);
+}
+
+.pp-toggle .mini {
+  --w: 42px; --h: 24px;
+  position: relative; width: var(--w); height: var(--h);
+  border-radius: 999px; border: none; display: block;
+  background: linear-gradient(90deg, #00E5FF 0%, #FF8A6F 100%);
+  box-shadow: 0 2px 8px -2px rgba(0,229,255,.45);
+  cursor: pointer; transition: .3s;
+}
+
+.pp-toggle[aria-pressed="false"] .mini {
+  background: var(--surface-2); box-shadow: none;
+}
+
+.pp-toggle .mini .k {
+  position: absolute; top: 50%; left: 3px; transform: translateY(-50%);
+  width: 18px; height: 18px; border-radius: 50%;
+  background: #fff; box-shadow: 0 1px 5px rgba(0,0,0,.45);
+  transition: left .28s var(--ease);
+}
+
+.pp-toggle[aria-pressed="true"] .mini .k { left: calc(100% - 21px); }
+
+/* ── 分隔线 ── */
+.pp-divider {
+  height: 1px; background: var(--border-soft);
+  margin: 18px 0 0;
+  transition: background .5s var(--ease);
+}
+
+/* ── 步骤列表 ── */
+.steps {
+  display: flex; flex-direction: column;
+  gap: 0; margin: 0;
+}
+
+.step {
+  display: flex; gap: 12px; align-items: flex-start;
+  padding: 16px 4px;
+}
+
+.step:first-child { padding-bottom: 0; }
+.step + .step { padding-top: 0; }
+
+
+.step .num {
+  font-size: 15px; font-weight: 800; flex: 0 0 auto; line-height: 1.6;
+  background: linear-gradient(92deg, var(--cyan), var(--coral));
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+  min-width: 20px;
+}
+
+.step .txt {
+  font-size: 13.5px; line-height: 1.72; color: var(--text);
+  transition: color .5s var(--ease);
+}
+
+.step .txt b { font-weight: 700; }
+
+.step .txt .key {
+  font-weight: 700; color: var(--accent-cyan);
+  transition: color .5s var(--ease);
+}
+
+.step .txt .quo {
+  font-weight: 700; color: var(--accent-coral);
+  transition: color .5s var(--ease);
+}
+

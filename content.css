@@ -1,0 +1,110 @@
+/* GridForge Pro — 注入样式 */
+
+/* ── 复制按钮 ── */
+/* 按钮是 <table> 的直接子元素，table 已被 JS 设为 position:relative，
+   因此按钮的 absolute 定位基准是 table 本身，父级 overflow:hidden 不再裁剪它 */
+.gf-copy-btn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 999999 !important;
+
+  /* 布局 */
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 10px 4px 8px;
+  height: 28px;
+
+  /* 字体 */
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    "Helvetica Neue", sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1;
+  color: #374151;
+  white-space: nowrap;
+
+  /* 外观 */
+  background: rgba(255, 255, 255, 0.92);
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  border-radius: 20px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.10), 0 0 0 0.5px rgba(0,0,0,0.04);
+  cursor: pointer;
+  user-select: none;
+
+  /* 常态半透明，让用户感知但不干扰阅读 */
+  opacity: 0.6;
+  transition: opacity 0.15s ease, background 0.15s ease, box-shadow 0.15s ease,
+    transform 0.1s ease;
+}
+
+/* 悬停：完全不透明 + 轻微上浮 */
+.gf-copy-btn:hover {
+  opacity: 1;
+  background: #ffffff;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.14), 0 0 0 0.5px rgba(0,0,0,0.06);
+  transform: translateY(-1px);
+}
+
+/* 按下 */
+.gf-copy-btn:active {
+  transform: translateY(0) scale(0.96);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.10);
+}
+
+/* SVG 图标 */
+.gf-svg {
+  width: 13px;
+  height: 13px;
+  flex-shrink: 0;
+}
+
+/* 文字标签 */
+.gf-label {
+  letter-spacing: 0.01em;
+}
+
+/* ── 状态：成功 ── */
+.gf-copy-btn[data-state="success"] {
+  color: #059669;
+  background: rgba(236, 253, 245, 0.95);
+  border-color: rgba(52, 211, 153, 0.4);
+  opacity: 1;
+}
+
+/* ── 状态：失败 ── */
+.gf-copy-btn[data-state="error"] {
+  color: #dc2626;
+  background: rgba(254, 242, 242, 0.95);
+  border-color: rgba(252, 165, 165, 0.4);
+  opacity: 1;
+}
+
+/* ── 暗色模式 ── */
+@media (prefers-color-scheme: dark) {
+  .gf-copy-btn {
+    color: #d1d5db;
+    background: rgba(31, 41, 55, 0.90);
+    border-color: rgba(255, 255, 255, 0.12);
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.35), 0 0 0 0.5px rgba(255,255,255,0.04);
+  }
+
+  .gf-copy-btn:hover {
+    background: rgba(55, 65, 81, 0.95);
+    border-color: rgba(255, 255, 255, 0.18);
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.4), 0 0 0 0.5px rgba(255,255,255,0.06);
+  }
+
+  .gf-copy-btn[data-state="success"] {
+    color: #34d399;
+    background: rgba(6, 78, 59, 0.90);
+    border-color: rgba(52, 211, 153, 0.35);
+  }
+
+  .gf-copy-btn[data-state="error"] {
+    color: #f87171;
+    background: rgba(69, 10, 10, 0.90);
+    border-color: rgba(248, 113, 113, 0.35);
+  }
+}
