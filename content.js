@@ -2,7 +2,10 @@
   'use strict';
 
   // ---------- 跨浏览器 API 抹平（Firefox 用 browser.*，其余用 chrome.*） ----------
-  const extensionAPI = (typeof browser !== 'undefined') ? browser : chrome; // eslint-disable-line no-undef
+  /* globals browser, chrome */
+  const extensionAPI = (typeof browser !== 'undefined') ? browser            // Firefox / Safari
+                     : (typeof chrome  !== 'undefined') ? chrome             // Chrome / Edge / 国产浏览器
+                     : null;                                                  // 非扩展环境（测试/调试）
 
   // ---------- SVG 图标常量 ----------
 
