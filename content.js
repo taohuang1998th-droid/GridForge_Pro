@@ -1,13 +1,13 @@
 (() => {
   'use strict';
 
-  // ---------- 跨浏览器 API 抹平（Firefox 用 browser.*，其余用 chrome.*） ----------
   /* globals browser, chrome */
-  const extensionAPI = (typeof browser !== 'undefined') ? browser            // Firefox / Safari
-                     : (typeof chrome  !== 'undefined') ? chrome             // Chrome / Edge / 国产浏览器
-                     : null;                                                  // 非扩展环境（测试/调试）
+  // 跨浏览器 API 命名空间：Firefox → browser，Chromium → chrome，其余为 null
+  const extensionAPI = (typeof browser !== 'undefined') ? browser
+                     : (typeof chrome  !== 'undefined') ? chrome
+                     : null; // eslint-disable-line no-unused-vars
 
-  // ---------- SVG 图标常量 ----------
+  // ── SVG 图标 ──────────────────────────────────────────────────────────────
 
   const ICON_COPY = `<svg class="gf-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
     stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -27,7 +27,7 @@
 
   const BTN_DEFAULT_HTML = `${ICON_COPY}<span class="gf-label">复制</span>`;
 
-  // ---------- 核心工具函数 ----------
+  // ── 工具函数 ──────────────────────────────────────────────────────────────
 
   function tableToPlainText(table) {
     return Array.from(table.querySelectorAll('tr'))
@@ -39,7 +39,7 @@
       .join('\n');
   }
 
-  // 从 style 属性字符串中删除所有 border-* 和 outline 声明
+  // 从 style 属性字符串中移除所有 border-* 与 outline 声明
   function stripBorderStyles(el) {
     if (!el.hasAttribute('style')) return;
     const kept = el.getAttribute('style')
@@ -54,42 +54,34 @@
     kept ? el.setAttribute('style', kept) : el.removeAttribute('style');
   }
 
-  // 克隆表格，移除注入按钮，按模式写入/清除边框样式
+  // 克隆表格，移除注入按钮，再按模式写入或清除边框样式
   function prepareHTML(table, bordered) {
     const clone = table.cloneNode(true);
-
-    // Bug 1：精准移除克隆内的注入按钮，防止文本污染剪贴板
     clone.querySelector('.gf-copy-btn')?.remove();
 
     if (bordered) {
-      // Bug 2：border="1" 在现代 Word/WPS 中经常失效，
-      // 必须用内联 style 明确告知每个单元格边框。
-      // 用 setAttribute 写字符串，避免浏览器把 #cccccc 归一化为 rgb(...)
+      // 通过 setAttribute 写原始字符串，防止浏览器将 #cccccc 归一化为 rgb()，
+      // 确保 Word / WPS 能正确解析内联边框
       clone.setAttribute('border', '1');
-      clone.setAttribute(
-        'style',
-        'border-collapse: collapse; border: 1px solid #cccccc;'
+      clone.setAttribute('style', 'border-collapse: collapse; border: 1px solid #cccccc;');
+      clone.querySelectorAll('th, td').forEach(cell =>
+        cell.setAttribute('style', 'border: 1px solid #cccccc; padding: 8px;')
       );
-      clone.querySelectorAll('th, td').forEach(cell => {
-        cell.setAttribute(
-          'style',
-          'border: 1px solid #cccccc; padding: 8px;'
-        );
-      });
     } else {
       clone.setAttribute('border', '0');
       clone.removeAttribute('cellspacing');
-      // 先剥离所有继承的 border CSS，再明文设为 none 防止残留
+      // 先剥离继承的边框声明，再显式置为 none 以防残留
       [clone, ...clone.querySelectorAll('*')].forEach(stripBorderStyles);
-      clone.querySelectorAll('th, td').forEach(cell => {
-        cell.setAttribute('style', 'border: none;');
-      });
+      clone.querySelectorAll('th, td').forEach(cell =>
+        cell.setAttribute('style', 'border: none;')
+      );
     }
 
     return clone.outerHTML;
   }
 
-  // execCommand 兜底：拦截 copy 事件写入富文本（覆盖不支持 ClipboardItem 的环境）
+  // execCommand 兜底：通过拦截 copy 事件写入富文本
+  // 覆盖不支持 ClipboardItem 的旧版浏览器环境
   function legacyCopy(htmlContent, plainContent) {
     return new Promise((resolve, reject) => {
       const handler = e => {
@@ -103,21 +95,19 @@
         }
       };
       document.addEventListener('copy', handler, { once: true });
-      const ok = document.execCommand('copy');
-      if (!ok) {
+      if (!document.execCommand('copy')) {
         document.removeEventListener('copy', handler);
-        reject(new Error('execCommand copy failed'));
+        reject(new Error('execCommand copy unavailable'));
       }
     });
   }
 
-  // bordered=true → 带框线；bordered=false → 无框线
   async function copyTableToClipboard(table, button, bordered) {
     const htmlContent  = prepareHTML(table, bordered);
     const plainContent = tableToPlainText(table);
     const successLabel = bordered ? '已复制（带框线）' : '已复制（无框线）';
 
-    // 第一层：现代标准 Clipboard API（Chrome / Edge / Firefox 87+ / 国产 Chromium 浏览器）
+    // 第一层：现代标准 Clipboard API（Chrome / Edge / Firefox 87+ / 国产 Chromium）
     if (typeof ClipboardItem !== 'undefined' && navigator.clipboard?.write) {
       try {
         await navigator.clipboard.write([
@@ -128,25 +118,24 @@
         ]);
         showFeedback(button, 'success', successLabel);
         return;
-      } catch { /* 降级到下一层 */ }
+      } catch { /* 降级 */ }
     }
 
-    // 第二层：writeText（纯文本，几乎所有现代浏览器均支持）
+    // 第二层：writeText（纯文本，所有现代浏览器均支持）
     if (navigator.clipboard?.writeText) {
       try {
         await navigator.clipboard.writeText(plainContent);
         showFeedback(button, 'success', '纯文本');
         return;
-      } catch { /* 降级到下一层 */ }
+      } catch { /* 降级 */ }
     }
 
-    // 第三层：execCommand（Firefox 旧版、Safari、老式国产浏览器兜底）
+    // 第三层：execCommand（旧版 Firefox / Safari / 老式国产浏览器兜底）
     try {
       await legacyCopy(htmlContent, plainContent);
       showFeedback(button, 'success', successLabel);
-    } catch (err) {
+    } catch {
       showFeedback(button, 'error', '失败');
-      console.error('[GridForge] 复制失败:', err);
     }
   }
 
@@ -161,24 +150,15 @@
     }, 2000);
   }
 
-  // ---------- 注入逻辑 ----------
+  // ── 注入逻辑 ──────────────────────────────────────────────────────────────
 
-  // 已处理表格集合 — WeakSet 不阻止 GC
   const processedTables = new WeakSet();
 
   function injectButton(table) {
-    if (processedTables.has(table)) return;
-
-    // 表格必须已挂载到文档，否则跳过（等待下次扫描）
-    if (!table.isConnected) return;
-
+    if (processedTables.has(table) || !table.isConnected || !table.parentElement) return;
     processedTables.add(table);
 
-    const parent = table.parentElement;
-    if (!parent) return;
-
-    // 让 table 自身成为按钮的定位基准，按钮就在 overflow 裁剪范围之内，
-    // 父级容器的 overflow:hidden / overflow-x:auto 不再能裁剪它
+    // 以 table 自身作为定位基准，使按钮处于 overflow 裁剪区域之内
     if (getComputedStyle(table).position === 'static') {
       table.style.position = 'relative';
     }
@@ -195,41 +175,35 @@
       copyTableToClipboard(table, button, !e.altKey);
     });
 
-    // 插入到 table 内部最前方；position:absolute 将其移出正常流，不影响表格布局
     table.insertBefore(button, table.firstChild);
   }
 
-  // ---------- 扫描调度 ----------
+  // ── 扫描调度 ──────────────────────────────────────────────────────────────
 
   function scanAndInject() {
     document.querySelectorAll('table').forEach(injectButton);
   }
 
-  // 防抖：流式输出期间 mutations 高频触发，合并为一次扫描
   let debounceTimer = null;
   function scheduleScan() {
     clearTimeout(debounceTimer);
     debounceTimer = setTimeout(scanAndInject, 250);
   }
 
-  // MutationObserver：监听整棵 DOM 树的子节点变化
   function startObserver() {
-    const observer = new MutationObserver(scheduleScan);
-    observer.observe(document.body, {
+    new MutationObserver(scheduleScan).observe(document.body, {
       childList: true,
       subtree: true,
     });
   }
 
-  // 兜底轮询：应对 Shadow DOM / 虚拟化列表 / 懒渲染等极端场景
-  // 每秒扫描一次，持续 30 秒后停止
+  // 兜底轮询：覆盖 Shadow DOM / 虚拟列表 / 懒渲染等极端场景，30 秒后自动停止
   let pollCount = 0;
   const poller = setInterval(() => {
     scanAndInject();
     if (++pollCount >= 30) clearInterval(poller);
   }, 1000);
 
-  // ---------- 启动 ----------
-  scanAndInject();   // 立即兜底扫描
-  startObserver();   // 监听后续 DOM 变化
+  scanAndInject();
+  startObserver();
 })();
