@@ -1,6 +1,9 @@
 (() => {
   'use strict';
 
+  // ---------- 跨浏览器 API 抹平（Firefox 用 browser.*，其余用 chrome.*） ----------
+  const extensionAPI = (typeof browser !== 'undefined') ? browser : chrome; // eslint-disable-line no-undef
+
   // ---------- SVG 图标常量 ----------
 
   const ICON_COPY = `<svg class="gf-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
@@ -83,28 +86,64 @@
     return clone.outerHTML;
   }
 
+  // execCommand 兜底：拦截 copy 事件写入富文本（覆盖不支持 ClipboardItem 的环境）
+  function legacyCopy(htmlContent, plainContent) {
+    return new Promise((resolve, reject) => {
+      const handler = e => {
+        try {
+          e.clipboardData.setData('text/html', htmlContent);
+          e.clipboardData.setData('text/plain', plainContent);
+          e.preventDefault();
+          resolve();
+        } catch (err) {
+          reject(err);
+        }
+      };
+      document.addEventListener('copy', handler, { once: true });
+      const ok = document.execCommand('copy');
+      if (!ok) {
+        document.removeEventListener('copy', handler);
+        reject(new Error('execCommand copy failed'));
+      }
+    });
+  }
+
   // bordered=true → 带框线；bordered=false → 无框线
   async function copyTableToClipboard(table, button, bordered) {
     const htmlContent  = prepareHTML(table, bordered);
     const plainContent = tableToPlainText(table);
     const successLabel = bordered ? '已复制（带框线）' : '已复制（无框线）';
 
-    try {
-      await navigator.clipboard.write([
-        new ClipboardItem({
-          'text/html': new Blob([htmlContent], { type: 'text/html' }),
-          'text/plain': new Blob([plainContent], { type: 'text/plain' }),
-        }),
-      ]);
-      showFeedback(button, 'success', successLabel);
-    } catch {
+    // 第一层：现代标准 Clipboard API（Chrome / Edge / Firefox 87+ / 国产 Chromium 浏览器）
+    if (typeof ClipboardItem !== 'undefined' && navigator.clipboard?.write) {
+      try {
+        await navigator.clipboard.write([
+          new ClipboardItem({
+            'text/html':  new Blob([htmlContent],  { type: 'text/html' }),
+            'text/plain': new Blob([plainContent], { type: 'text/plain' }),
+          }),
+        ]);
+        showFeedback(button, 'success', successLabel);
+        return;
+      } catch { /* 降级到下一层 */ }
+    }
+
+    // 第二层：writeText（纯文本，几乎所有现代浏览器均支持）
+    if (navigator.clipboard?.writeText) {
       try {
         await navigator.clipboard.writeText(plainContent);
         showFeedback(button, 'success', '纯文本');
-      } catch (err) {
-        showFeedback(button, 'error', '失败');
-        console.error('[GridForge] 复制失败:', err);
-      }
+        return;
+      } catch { /* 降级到下一层 */ }
+    }
+
+    // 第三层：execCommand（Firefox 旧版、Safari、老式国产浏览器兜底）
+    try {
+      await legacyCopy(htmlContent, plainContent);
+      showFeedback(button, 'success', successLabel);
+    } catch (err) {
+      showFeedback(button, 'error', '失败');
+      console.error('[GridForge] 复制失败:', err);
     }
   }
 

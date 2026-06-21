@@ -3,6 +3,12 @@
   "name": "GridForge Pro",
   "version": "1.0.0",
   "description": "一键复制 AI 生成的表格，完美保留格式，直接粘贴到 Word / WPS。",
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "gridforge-pro@aurloop.com",
+      "strict_min_version": "109.0"
+    }
+  },
   "icons": {
     "16": "icons/icon16.png",
     "48": "icons/icon48.png",

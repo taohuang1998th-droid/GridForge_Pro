@@ -1,3 +1,6 @@
+// 跨浏览器 API 抹平（Firefox 用 browser.*，其余用 chrome.*）
+const extensionAPI = (typeof browser !== 'undefined') ? browser : chrome; // eslint-disable-line no-undef
+
 const doc      = document.getElementById('doc');
 const ppToggle = document.getElementById('ppToggle');
 const ppLabel  = ppToggle.querySelector('.tlbl');
