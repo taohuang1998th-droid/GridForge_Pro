@@ -5,7 +5,10 @@
   // 跨浏览器 API 命名空间：Firefox → browser，Chromium → chrome，其余为 null
   const extensionAPI = (typeof browser !== 'undefined') ? browser
                      : (typeof chrome  !== 'undefined') ? chrome
-                     : null; // eslint-disable-line no-unused-vars
+                     : null;
+
+  // Chrome/Firefox i18n — returns empty string as safe fallback when unavailable
+  const i18n = key => extensionAPI?.i18n?.getMessage(key) || '';
 
   // ── SVG 图标 ──────────────────────────────────────────────────────────────
 
@@ -25,7 +28,7 @@
     <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
   </svg>`;
 
-  const BTN_DEFAULT_HTML = `${ICON_COPY}<span class="gf-label">复制</span>`;
+  const BTN_DEFAULT_HTML = `${ICON_COPY}<span class="gf-label">${i18n('copyButton')}</span>`;
 
   // ── 工具函数 ──────────────────────────────────────────────────────────────
 
@@ -105,7 +108,7 @@
   async function copyTableToClipboard(table, button, bordered) {
     const htmlContent  = prepareHTML(table, bordered);
     const plainContent = tableToPlainText(table);
-    const successLabel = bordered ? '已复制（带框线）' : '已复制（无框线）';
+    const successLabel = bordered ? i18n('copySuccessBordered') : i18n('copySuccessBorderless');
 
     // 第一层：现代标准 Clipboard API（Chrome / Edge / Firefox 87+ / 国产 Chromium）
     if (typeof ClipboardItem !== 'undefined' && navigator.clipboard?.write) {
@@ -125,7 +128,7 @@
     if (navigator.clipboard?.writeText) {
       try {
         await navigator.clipboard.writeText(plainContent);
-        showFeedback(button, 'success', '纯文本');
+        showFeedback(button, 'success', i18n('copySuccessPlain'));
         return;
       } catch { /* 降级 */ }
     }
@@ -135,7 +138,7 @@
       await legacyCopy(htmlContent, plainContent);
       showFeedback(button, 'success', successLabel);
     } catch {
-      showFeedback(button, 'error', '失败');
+      showFeedback(button, 'error', i18n('copyFailed'));
     }
   }
 
@@ -166,7 +169,7 @@
     const button = document.createElement('button');
     button.className = 'gf-copy-btn';
     button.setAttribute('type', 'button');
-    button.setAttribute('aria-label', 'GridForge 一键复制表格');
+    button.setAttribute('aria-label', i18n('copyAriaLabel'));
     button.innerHTML = BTN_DEFAULT_HTML;
 
     button.addEventListener('click', e => {

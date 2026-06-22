@@ -1,0 +1,54 @@
+{
+  "extensionName": {
+    "message": "GridForge Pro · AI 表格完美复制工具",
+    "description": "Extension name shown in the Chrome Web Store and browser toolbar"
+  },
+  "extensionDescription": {
+    "message": "网页小插件：一键复制 AI 表格，完美保留格式，直接粘贴到 Word / WPS",
+    "description": "Short description shown in the Chrome Web Store"
+  },
+  "copyButton": {
+    "message": "复制",
+    "description": "Label on the copy button injected into AI tables"
+  },
+  "copySuccessBordered": {
+    "message": "已复制（带框线）",
+    "description": "Feedback shown after copying a table with borders"
+  },
+  "copySuccessBorderless": {
+    "message": "已复制（无框线）",
+    "description": "Feedback shown after copying a table without borders (Alt+click)"
+  },
+  "copySuccessPlain": {
+    "message": "纯文本",
+    "description": "Feedback when only plain-text copy succeeded (writeText fallback)"
+  },
+  "copyFailed": {
+    "message": "失败",
+    "description": "Feedback when all copy methods failed"
+  },
+  "copyAriaLabel": {
+    "message": "GridForge 一键复制表格",
+    "description": "Accessible label for the injected copy button"
+  },
+  "themeDark": {
+    "message": "深色",
+    "description": "Label on the theme toggle when dark mode is active"
+  },
+  "themeLight": {
+    "message": "浅色",
+    "description": "Label on the theme toggle when light mode is active"
+  },
+  "toggleAriaLabel": {
+    "message": "切换深色 / 浅色",
+    "description": "Accessible label for the dark/light theme toggle button"
+  },
+  "step1Text": {
+    "message": "点击 AI 表格右上角的<span class=\"quo\">「复制」</span>按钮，复制<b>带框线表格</b>。",
+    "description": "Instruction step 1 (rendered as innerHTML; contains safe span/b markup)"
+  },
+  "step2Text": {
+    "message": "按住 <span class=\"key\">Alt（Windows）/ Option（Mac）</span>键同时点击<span class=\"quo\">「复制」</span>按钮，复制<b>无框线表格</b>。",
+    "description": "Instruction step 2 (rendered as innerHTML; contains safe span/b markup)"
+  }
+}

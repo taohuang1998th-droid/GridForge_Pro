@@ -1,0 +1,54 @@
+{
+  "extensionName": {
+    "message": "GridForge Pro · Ultimate AI Table Copier",
+    "description": "Extension name shown in the Chrome Web Store and browser toolbar"
+  },
+  "extensionDescription": {
+    "message": "Copy AI-generated tables with perfect formatting. Paste directly into Word or WPS seamlessly.",
+    "description": "Short description shown in the Chrome Web Store"
+  },
+  "copyButton": {
+    "message": "Copy",
+    "description": "Label on the copy button injected into AI tables"
+  },
+  "copySuccessBordered": {
+    "message": "Copied (with borders)",
+    "description": "Feedback shown after copying a table with borders"
+  },
+  "copySuccessBorderless": {
+    "message": "Copied (no borders)",
+    "description": "Feedback shown after copying a table without borders (Alt+click)"
+  },
+  "copySuccessPlain": {
+    "message": "Plain text",
+    "description": "Feedback when only plain-text copy succeeded (writeText fallback)"
+  },
+  "copyFailed": {
+    "message": "Failed",
+    "description": "Feedback when all copy methods failed"
+  },
+  "copyAriaLabel": {
+    "message": "GridForge: Copy this table",
+    "description": "Accessible label for the injected copy button"
+  },
+  "themeDark": {
+    "message": "Dark",
+    "description": "Label on the theme toggle when dark mode is active"
+  },
+  "themeLight": {
+    "message": "Light",
+    "description": "Label on the theme toggle when light mode is active"
+  },
+  "toggleAriaLabel": {
+    "message": "Switch dark / light theme",
+    "description": "Accessible label for the dark/light theme toggle button"
+  },
+  "step1Text": {
+    "message": "Click the <span class=\"quo\">「Copy」</span> button at the top-right of any AI-generated table to copy it <b>with borders</b>.",
+    "description": "Instruction step 1 (rendered as innerHTML; contains safe span/b markup)"
+  },
+  "step2Text": {
+    "message": "Hold <span class=\"key\">Alt (Windows) / Option (Mac)</span>, then click <span class=\"quo\">「Copy」</span> to copy the table <b>without borders</b>.",
+    "description": "Instruction step 2 (rendered as innerHTML; contains safe span/b markup)"
+  }
+}
